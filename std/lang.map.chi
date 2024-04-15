@@ -1,0 +1,7 @@
+package std/lang.map
+
+type Map[K,V] = { }
+
+fn emptyMap[K,V](): Map[K,V] {
+    { }
+}

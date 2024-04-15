@@ -1,0 +1,4 @@
+package std/lang.set
+
+type Set[T] = array[T]
+

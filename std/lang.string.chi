@@ -1,0 +1,141 @@
+package std/lang.string
+
+import std/lang { luaExpr, embedLua }
+
+pub fn len(s: string): int {
+    luaExpr("utf8.len(s)")
+}
+
+pub fn reverse(s: string) {
+    luaExpr("string.reverse(s)")
+}
+
+pub fn find(s: string, pattern: string): int {
+    luaExpr("string.find(s, pattern, 1, true)")
+}
+
+pub fn findFrom(s: string, pattern: string, from: int): int {
+    luaExpr("string.find(s, pattern, from, true)")
+}
+
+pub fn repeatTimes(s: string, times: int): string {
+    luaExpr("string.rep(s, times)")
+}
+
+pub fn repeatSeparated(s: string, times: int, separator: string): string {
+    luaExpr("string.rep(s, times, separator)")
+}
+
+pub fn substringFrom(s: string, from: int): string {
+    luaExpr("string.sub(s, from)")
+}
+
+pub fn substring(s: string, from: int, to: int): string {
+    luaExpr("string.sub(s, from, to)")
+}
+
+pub fn toLower(s: string): string {
+    luaExpr("string.lower(s)")
+}
+
+pub fn toUpper(s: string): string {
+    luaExpr("string.upper(s)")
+}
+
+pub fn replace(s: string, pattern: string, replacement: string): string {
+    luaExpr("string.gsub(s, pattern, replacement)")
+}
+
+pub fn codePointAt(s: string, index: int): int {
+    luaExpr("utf8.codepoint(s, index)")
+}
+
+pub fn codePoints(s: string): array[int] {
+    val x: array[int] = []
+    embedLua("for _, c in utf8.codes(s) do table.insert(x, c) end")
+    x
+}
+
+pub fn isWhitespace(cp: int): bool {
+    (28 <= cp && cp <= 32) || (9 <= cp && cp <= 14)
+}
+
+pub fn isDigit(codePoint: int): bool {
+    48 <= codePoint && codePoint <= 57
+}
+
+pub fn forEachCodePoint(s: string, f: (int) -> unit) {
+    var cp = 0
+    embedLua("for _, cp in utf8.codes(s) do")
+    f(cp)
+    embedLua("end")
+}
+
+pub fn allCodePoints(s: string, f: (int) -> bool): bool {
+    embedLua("for _, cp in utf8.codes(s) do if not f(cp) then return false end end")
+    true
+}
+
+pub fn anyCodePoint(s: string, f: (int) -> bool): bool {
+    embedLua("for _, cp in utf8.codes(s) do if f(cp) then return true end end")
+    false
+}
+
+pub fn isEmpty(s: string): bool {
+    s.len() == 0
+}
+
+pub fn isNotEmpty(s: string): bool {
+    !isEmpty(s)
+}
+
+pub fn isBlank(s: string): bool {
+    s.allCodePoints(isWhitespace) 
+}
+
+pub fn trimStart(s: string): string {
+    var start = 1
+    while start < s.len()-1 && isWhitespace(luaExpr("utf8.codepoint(s, start)")) {
+        start += 1
+    }
+    s.substringFrom(start)
+}
+
+pub fn trimEnd(s: string): string {
+    var last = -1
+    val strlen = -s.len()
+    while last > strlen && isWhitespace(s.codePointAt(last)) {
+        last -= 1
+    }
+    s.substring(1, last)
+}
+
+pub fn trim(s: string): string {
+    s.trimStart().trimEnd()
+}
+
+pub fn startsWith(s: string, other: string): bool {
+    s.substring(1, other.len()) == other
+}
+
+pub fn endsWith(s: string, other: string): bool {
+    s.substringFrom(-other.len()) == other
+}
+
+pub fn contains(s: string, other: string): bool {
+    luaExpr("string.find(s, other) ~= nil")
+}
+
+pub fn split(s: string, separator: string): array[string] {
+    val result = []
+    embedLua("for str in string.gmatch(s, '([^'.. separator ..']+)') do table.insert(result, str) end") 
+    result
+}
+
+pub fn removePrefix(s: string, prefix: string): string {
+    if s.startsWith(prefix) {
+        s.substringFrom(prefix.len())
+    } else {
+        s
+    }
+}

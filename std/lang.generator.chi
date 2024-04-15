@@ -1,0 +1,31 @@
+package std/lang.iterator
+
+import std/lang.option { Option }
+
+
+type Generator[V] = { initialValue: V, nextValue: (V) -> Option[V]}
+type StatefulGenerator[V,S] = { initialValue: V, state: S, nextvalue: (S, V) -> Option[V]}
+
+fn generator[V](initialValue: V, nextValue: (Option[V]) -> Option[V]): Generator {
+    { initialValue: initialValue, nextValue: nextValue }
+}
+
+{
+
+val g = generator(0) { last ->
+    if last > 10 {
+        unit
+    } else {
+        last + 1
+    }
+}
+
+var x = g.initialValue
+var nv = g.nextValue
+while true {
+    x = g.nextValue(x)
+    if x == unit { break }
+    println(x)
+}
+
+}()

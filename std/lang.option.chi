@@ -1,0 +1,20 @@
+package std/lang.option
+
+type Option[T] = T | unit
+
+pub fn orElse[T](opt: Option[T], other: Option[T]): Option[T] {
+    if opt is unit {
+        other
+    } else {
+        opt
+    }
+}
+
+pub fn map[T,R](opt: Option[T], f: (T) -> R): Option[R] {
+    if opt is unit {
+        unit
+    } else {
+        opt is T 
+        f(opt)
+    }
+}

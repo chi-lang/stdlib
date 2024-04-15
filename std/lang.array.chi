@@ -1,0 +1,94 @@
+package std/lang.array
+
+import std/lang { luaExpr, embedLua }
+import std/lang.option { Option }
+
+pub fn insertAt[T](arr: array[T], index: int, value: T) {
+    embedLua("table.insert(arr, index, value)")
+}
+
+pub fn removeAt[T](arr: array[T], index: int): T {
+    luaExpr("table.remove(arr, index)")
+}
+
+pub fn addLast[T](arr: array[T], value: T) {
+    embedLua("table.insert(arr, value)")
+}
+
+pub fn removeLast[T](arr: array[T]): T {
+    luaExpr("table.remove(arr)")
+}
+
+pub fn push[T](arr: array[T], value: T) {
+    arr.addLast(value)
+}
+
+pub fn pop[T](arr: array[T]): T {
+    arr.removeLast()
+}
+
+pub fn joinToString(arr: array[string|int], separator: string): string {
+    luaExpr("table.concat(arr, separator)")
+}
+
+pub fn sort[T](arr: array[T]) {
+    embedLua("table.sort(arr)")
+}
+
+pub fn sortWith[T](arr: array[T], comp: (T, T) -> bool) {
+    embedLua("table.sort(arr, comp)")
+}
+
+pub fn any[T](arr: array[T], f: (T) -> bool): bool {
+    embedLua("for i, v in ipairs(arr) do if f(v) then return true end end")
+    false
+}
+
+pub fn all[T](arr: array[T], f: (T) -> bool): bool {
+    embedLua("for _, v in ipairs(arr) do if not f(v) then return false end end")
+    true
+}
+
+pub fn first[T](arr: array[T]): Option[T] {
+    luaExpr("arr[1]")
+}
+
+pub fn last[T](arr: array[T]): Option[T] {
+    luaExpr("arr[#arr]")
+}
+
+pub fn size[T](arr: array[T]): int {
+    luaExpr("#arr")
+}
+
+pub fn reverse[T](arr: array[T]): array[T] {
+    val result = []
+    embedLua("for _, v in ipairs(arr) do table.insert(result, 1, v) end")
+    result
+}
+
+pub fn map[T,R](arr: array[T], f: (T) -> R): array[R] {
+    val result = []
+    embedLua("for _, v in ipairs(arr) do table.insert(result, f(v)) end")
+    result
+}
+
+pub fn forEach[T](arr: array[T], f: (T) -> unit) {
+    embedLua("for _, v in ipairs(arr) do f(v) end")
+}
+
+pub fn fold[T,R](arr: array[T], initialValue: R, f: (R, T) -> R): R {
+    var acc = initialValue
+    embedLua("for _, v in ipairs(arr) do acc = f(acc, v) end")
+    acc
+}
+
+pub fn reduce[T](arr: array[T], f: (T, T) -> T): T {
+    var acc = arr[1]
+    embedLua("for i = 2, #arr do acc = f(acc, arr[i]) end")
+    acc
+}
+
+pub fn sum(arr: array[int]): int {
+    arr.reduce({ a,b -> a+b })
+}

@@ -1,0 +1,1 @@
+if not chi.std__lang then chi.std__lang = { _package={}, _types={} } end;
