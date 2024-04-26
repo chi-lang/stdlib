@@ -1,8 +1,61 @@
 package std/lang.map
 
-type Map[K,V] = { foo: int }
+import std/lang { luaExpr, embedLua }
+
+type Map[K,V] = { class: string, map: any }
 
 fn emptyMap[K,V](): Map[K,V] {
-    { foo: 0 }
+    { class: "lang.map.Map", map: {} }
 }
+
+fn fromRecord[K,V](r: {}): Map[K,V] {
+    { class: "lang.map.Map", map: r }
+}
+
+fn put[K,V](m: Map[K,V], key: K, value: V) {
+    embedLua("m.map[key] = value")
+}
+
+fn get[K,V](m: Map[K,V], key: K): V {
+    luaExpr("m.map[key]")
+}
+
+fn size[K,V](m: Map[K,V]): int {
+    var result = 0
+    embedLua("for _ in pairs(m.map) do result = result + 1 end")
+    result
+}
+
+fn forEach[K,V](m: Map[K,V], f: (K,V) -> unit) {
+    embedLua("for k,v in pairs(m.map) do f(k,v) end")
+}
+
+fn mapKeys[K,V,R](m: Map[K,V], f: (K,V) -> R): Map[R,V] {
+    val new = emptyMap[R,V]()
+    embedLua("for k,v in pairs(m.map) do new.map[f(k,v)] = v end")
+    new
+}
+
+fn mapValues[K,V,R](m: Map[K,V], f: (K,V) -> R): Map[K,R] {
+    val new = emptyMap[K,R]()
+    embedLua("for k,v in pairs(m.map) do new.map[k] = f(k,v) end")
+    new
+}
+
+fn keys[K,V](m: Map[K,V]): array[K] { 
+    val result = []
+    m.forEach() { k, v ->
+        result.push(k)
+    }
+    result
+}
+
+fn values[K,V](m: Map[K,V]): array[V] {
+    val result = []
+    m.forEach() { k, v -> 
+        result.push(v)
+    }
+    result
+}
+
 
