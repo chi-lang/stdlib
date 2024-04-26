@@ -1,4 +1,54 @@
 package std/lang.set
 
-type Set[T] = array[T]
+import std/lang { luaExpr, embedLua }
+
+type Set[T] = { class: string, set: any }
+
+fn emptySet[T](): Set[T] {
+    { class: "lang.set.Set", set: {} }
+}
+
+fn fromArray[T](arr: array[T]): Set[T] {
+    val set = emptySet()
+    arr.forEach() { it ->
+        set.add(it)
+    }
+    set
+}
+
+fn add[T](set: Set[T], value: T) {
+    embedLua("set.set[value] = true")
+}
+
+fn remove[T](set: Set[T], value: T) {
+    embedLua("set.set[value] = nil")
+}
+
+fn contains[T](set: Set[T], value: T): bool {
+    luaExpr("set.set[value] or false") as bool
+}
+
+fn size[T](set: Set[T]): int {
+    var result = 0
+    embedLua("for _ in pairs(set.set) do result = result + 1 end")
+    result
+}
+
+fn forEach[T](set: Set[T], f: (T) -> unit) {
+    embedLua("for k,v in pairs(set.set) do f(k) end")
+}
+
+fn toArray[T](set: Set[T]): array[T] {
+    val result = []
+    set.forEach() { it ->
+        result.push(it)
+    }
+    result
+}
+
+fn fold[T,R](set: Set[T], initialValue: R, f: (R,T) -> R): R {
+    var acc = initialValue
+    embedLua("for k,_ in pairs(set.set) do acc = f(acc, k) end")
+    acc
+}
 
