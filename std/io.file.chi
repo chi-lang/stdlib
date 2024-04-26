@@ -1,32 +1,56 @@
 package std/io.file
 
 import std/lang { luaExpr, embedLua }
+import std/lang.option { Option }
 
-type File = { file: any }
+type File = { class: string, file: any }
 
 /// Returns a function that iterates over the lines of the file
 pub fn lines(fileName: string): () -> string|unit {
     luaExpr("io.lines(fileName)")
 }
 
-pub fn open(name: string, mode: string): File {
-    val f = { file: unit }
+/// Opens a file
+/// Modes: 
+///  - "r" read mode
+///  - "w" write mode
+///  - "a" append mode
+///  - "r+" update mode, all previous data is preserved
+///  - "w+" update mode, all previous data is erased
+///  - "a+" append update mode, previous data is preserved, 
+///         writing is only allowed at the end of file
+pub fn open(name: string, mode: string): Option[File] {
+    val f = { class: "io.file.File", file: unit }
     embedLua("f.file = io.open(name, mode)")
+    embedLua("if f.file == nil then return nil end")
     f
 }
 
-pub fn close(file: File) {
-    embedLua("file.file:close()")
+pub fn flush(file: File) {
+    embedLua("file.file:flush()")
 }
 
-val f = open("main.chi", "r")
-println(f)
-f.close()
+pub fn lines(file: File): () -> string|unit {
+    luaExpr("file.file:lines()")
+}
 
-//var line: string|unit = unit
-//val iter = lines("main.chi")
-//
-//while (line = iter()) != unit {
-//    println(line)
-//}
+pub fn seekStart(file: File, offset: int) {
+    embedLua("file.file:seek('set', offset)")
+}
+
+pub fn seek(file: File, offset: int) {
+    embedLua("file.file:seek('cur', offset)")
+}
+
+pub fn seekEnd(file: File, offset: int) {
+    embedLua("file.file:seek('end', offset)")
+}
+
+pub fn close(file: File) {
+    embedLua("io.close(file.file)")
+}
+
+pub fn write(file: File, value: string | float | int) {
+    embedLua("file.file:write(value)")
+}
 
