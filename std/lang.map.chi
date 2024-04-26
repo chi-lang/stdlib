@@ -1,7 +1,8 @@
 package std/lang.map
 
-type Map[K,V] = { }
+type Map[K,V] = { foo: int }
 
 fn emptyMap[K,V](): Map[K,V] {
-    { }
+    { foo: 0 }
 }
+

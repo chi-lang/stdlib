@@ -1,0 +1,32 @@
+package std/io.file
+
+import std/lang { luaExpr, embedLua }
+
+type File = { file: any }
+
+/// Returns a function that iterates over the lines of the file
+pub fn lines(fileName: string): () -> string|unit {
+    luaExpr("io.lines(fileName)")
+}
+
+pub fn open(name: string, mode: string): File {
+    val f = { file: unit }
+    embedLua("f.file = io.open(name, mode)")
+    f
+}
+
+pub fn close(file: File) {
+    embedLua("file.file:close()")
+}
+
+val f = open("main.chi", "r")
+println(f)
+f.close()
+
+//var line: string|unit = unit
+//val iter = lines("main.chi")
+//
+//while (line = iter()) != unit {
+//    println(line)
+//}
+
