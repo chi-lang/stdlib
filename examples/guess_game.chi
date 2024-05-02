@@ -5,7 +5,7 @@ import std/lang { luaExpr }
 
 val number = randomInt(0, 10)
 
-println("I've chosen number from 0 to 1000. Guess which one!")
+println("I've chosen number from 0 to 100. Guess which one!")
 
 while true {
     print("> ")
