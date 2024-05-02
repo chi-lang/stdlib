@@ -1,0 +1,14 @@
+
+var fib: (int) -> int = { i -> i }
+fib = { n: int ->
+    if n == 0 {
+        return 0
+    } 
+    if n == 1 {
+        return 1
+    } 
+
+    fib(n-1) + fib(n-2)
+}
+
+println(fib(8))

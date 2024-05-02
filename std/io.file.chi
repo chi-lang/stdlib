@@ -1,13 +1,31 @@
 package std/io.file
-
 import std/lang { luaExpr, embedLua }
 import std/lang.option { Option }
 
 type File = { class: string, file: any }
 
 /// Returns a function that iterates over the lines of the file
-pub fn lines(fileName: string): () -> string|unit {
+pub fn lineIterator(fileName: string): () -> string|unit {
     luaExpr("io.lines(fileName)")
+}
+
+pub fn readAllLines(fileName: string): array[string] {
+    var a = []
+    embedLua("for line in io.lines(fileName) do table.insert(a,line) end")
+    a
+}
+
+pub fn writeString(fileName: string, value: string) {
+    embedLua("local f=io.open(fileName,'w')")
+    embedLua("f:write(value)")
+    embedLua("f:close()")
+}
+
+pub fn readString(fileName: string): string {
+    embedLua("local f=io.open(fileName,'r')")
+    embedLua("local r=f:read('a')")
+    embedLua("f:close()")
+    luaExpr("r")
 }
 
 /// Opens a file

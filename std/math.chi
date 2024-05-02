@@ -1,0 +1,119 @@
+package std/math
+
+import std/lang { luaExpr as lua, embedLua as elua }
+
+pub val maxInt: int = lua("math.maxinteger")
+pub val minInt: int = lua("math.mininteger")
+pub val inf: int = lua("math.huge")
+pub val finf: float = lua("math.huge") as float
+pub val pi: float = lua("math.pi") as float
+
+pub fn abs(x: int): int {
+    lua("math.abs(x)")
+}
+
+pub fn min(a: int, b: int): int {
+    lua("math.min(a,b)")
+}
+
+pub fn fmin(a: float, b: float): float {
+    lua("math.min(a,b)")
+}
+
+pub fn max(a: int, b: int): int {
+    lua("math.max(a,b)")
+}
+
+pub fn fmax(a: float, b: float): float {
+    lua("math.max(a,b)")
+}
+
+pub fn fabs(x: float): float {
+    lua("math.abs(x)")
+}
+
+pub fn cos(x: float): float {
+    lua("math.cos(x)")
+}
+
+pub fn acos(x: float): float {
+    lua("math.acos(x)")
+}
+
+pub fn cosh(x: float): float {
+    lua("math.cosh(x)")
+}
+
+pub fn sin(x: float): float {
+    lua("math.sin(x)")
+}
+
+pub fn asin(x: float): float {
+    lua("math.asin(x)")
+}
+
+pub fn sinh(x: float): float {
+    lua("math.sinh(x)")
+}
+
+pub fn tan(x: float): float {
+    lua("math.tan(x)")
+}
+
+pub fn atan(x: float): float {
+    lua("math.atan(x)")
+}
+
+pub fn tanh(x: float): float {
+    lua("math.tanh(x)")
+}
+
+pub fn degrees(radians: float): float {
+    lua("math.deg(radians)")
+}
+
+pub fn radians(degrees: float): float {
+    lua("math.rad(degrees)")
+}
+
+pub fn ceil(x: float): float {
+    lua("math.ceil(x)")
+}
+
+pub fn floor(x: float): float {
+    lua("math.floor(x)")
+}
+
+/// Computes e^x
+pub fn exp(x: float): float {
+    lua("math.exp(x)")
+}
+
+pub fn log(x: float, base: float): float {
+    lua("math.log(x,base)")
+}
+
+pub fn pow(x:int, y: int): int {
+    lua("math.pow(x,y)")
+}
+
+pub fn fpow(x:float, y: float): float {
+    lua("math.pow(x,y)")
+}
+
+pub fn sqrt(x: float): float {
+    lua("math.sqrt(x)")
+}
+
+/// Splits fractional value into integer and float parts
+pub fn modf(x: float): { i: int, f: float } {
+    var i:int=0
+    var f:float=0.0
+    elua("i,f=math.modf(x)")
+    {i:i,f:f}
+}
+
+pub fn fmod(x: float, y: float): float {
+    lua("math.fmod(x,y)")
+}
+

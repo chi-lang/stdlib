@@ -1,0 +1,20 @@
+package std/math.random
+
+import std/lang { luaExpr as lua }
+
+/// Sets the seed for random number generator
+pub fn seed(seed: int) {
+    lua("math.randomseed(seed)")
+}
+
+/// Returns an integer value from given range
+pub fn randomInt(s: int, e: int): int {
+    lua("math.random(s,e)")
+}
+
+/// Returns float from range [0,1)
+pub fn randomFloat(): float {
+    lua("math.random()")
+}
+
+

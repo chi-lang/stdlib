@@ -1,0 +1,99 @@
+package user/compile
+
+import std/lang { luaExpr, embedLua, compileLua }
+
+// All this basic functions are copied here for full recompilation
+// in which case the stdlib is not available.
+
+pub fn size[T](arr: array[T]): int {
+    luaExpr("#arr")
+}
+
+pub fn addLast[T](arr: array[T], value: T) {
+    embedLua("table.insert(arr, value)")
+}
+
+pub fn writeString(fileName: string, value: string) {
+    embedLua("local f=io.open(fileName,'w')")
+    embedLua("f:write(value)")
+    embedLua("f:close()")
+}
+
+pub fn readString(fileName: string): string {
+    embedLua("local f=io.open(fileName,'r')")
+    embedLua("local r=f:read('a')")
+    embedLua("f:close()")
+    luaExpr("r")
+}
+
+
+pub fn loadLuaCode(luaCode: string): () -> unit {
+    luaExpr("load(luaCode)")
+}
+
+pub fn compileConcat(files: array[string], opts: { loadCompiledModules: bool, verbose: bool }): string {
+    var i = 1
+    val results = []
+    while i <= files.size() {
+        val fileName = files[i]
+        if opts.verbose {
+            println("Compiling $fileName...")
+        }
+        val chiCode = readString(fileName)
+        val luaCode = compileLua(chiCode)
+        results.addLast("function m${i}() ")
+        results.addLast(luaCode)
+        results.addLast(" end;m${i}();")
+
+        if opts.loadCompiledModules {
+            val loader = loadLuaCode(luaCode)
+            loader()
+        }
+
+        i as int
+        i += 1
+    }
+    luaExpr("table.concat(results)")
+}
+
+pub fn generateBytecode(f: ()->unit): string {
+    luaExpr("string.dump(f)")
+}
+
+pub fn compileModule(
+    fileName: string, 
+    components: array[string],
+    opts: {
+        loadCompiledModules: bool,
+        verbose: bool,
+        binary: bool
+    }
+) {
+    val luaCode = compileConcat(components, opts)
+    if opts.binary {
+        val loaderFunction = loadLuaCode(luaCode)
+        val bytecode = generateBytecode(loaderFunction)
+        writeString(fileName, bytecode)
+    } else {
+        writeString(fileName, luaCode)
+    }
+}
+
+
+compileModule("std.chim", [
+    "std/lang.option.chi",
+    "std/lang.array.chi",
+    "std/lang.map.chi",
+    "std/lang.set.chi",
+    "std/lang.string.chi",
+    "std/io.chi",
+    "std/io.file.chi",
+    "std/math.chi",
+    "std/math.random.chi",
+    "std/lang.chi"
+], {
+    loadCompiledModules: true,
+    verbose: true,
+    binary: false
+})
+

@@ -1,1 +1,63 @@
 package std/lang
+
+import std/io.file { readString, writeString }
+
+pub fn loadLuaCode(luaCode: string): () -> unit {
+    luaExpr("load(luaCode)")
+}
+
+pub fn evalFile(fileName: string) {
+    val chiCode = readString(fileName)
+    val luaCode = compileLua(chiCode)
+    val loader = loadLuaCode(luaCode)
+    loader()
+}
+
+pub fn compileConcat(files: array[string], opts: { loadCompiledModules: bool, verbose: bool }): string {
+    var i = 1
+    val results = []
+    while i <= files.size() {
+        val fileName = files[i]
+        if opts.verbose {
+            println("Compiling $fileName...")
+        }
+        val chiCode = readString(fileName)
+        val luaCode = compileLua(chiCode)
+        results.push("function m${i}() ")
+        results.push(luaCode)
+        results.push(" end;m${i}();")
+
+        if opts.loadCompiledModules {
+            val loader = loadLuaCode(luaCode)
+            loader()
+        }
+
+        i as int
+        i += 1
+    }
+    luaExpr("table.concat(results)")
+}
+
+pub fn generateBytecode(f: ()->unit): string {
+    luaExpr("string.dump(f)")
+}
+
+pub fn compileModule(
+    fileName: string, 
+    components: array[string],
+    opts: {
+        loadCompiledModules: bool,
+        verbose: bool,
+        binary: bool
+    }
+) {
+    val luaCode = compileConcat(components, opts)
+    if opts.binary {
+        val loaderFunction = loadLuaCode(luaCode)
+        val bytecode = generateBytecode(loaderFunction)
+        writeString(fileName, bytecode)
+    } else {
+        writeString(fileName, luaCode)
+    }
+}
+

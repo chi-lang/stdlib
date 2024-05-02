@@ -2,6 +2,18 @@ package std/lang.option
 
 type Option[T] = T | unit
 
+pub fn asOption[T](value: T): Option[T] {
+    value
+}
+
+pub fn valueOr[T](opt: Option[T], alternative: T): T {
+    if opt is unit {
+        alternative
+    } else {
+        opt as T
+    }
+}
+
 pub fn orElse[T](opt: Option[T], other: Option[T]): Option[T] {
     if opt is unit {
         other

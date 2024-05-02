@@ -1,0 +1,8 @@
+package std/io
+
+import std/lang { luaExpr }
+
+pub fn readLine(): string {
+    luaExpr("io.read()") as string
+}
+

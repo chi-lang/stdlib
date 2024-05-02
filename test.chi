@@ -1,0 +1,23 @@
+
+import std/io { readLine }
+import std/math.random { randomInt }
+import std/lang { luaExpr }
+
+val number = randomInt(0, 10)
+
+println("I've chosen number from 0 to 1000. Guess which one!")
+
+while true {
+    print("> ")
+    val n = readLine() as int
+    if n == number {
+        println("You guessed it!")
+        break
+    }
+    if n < number {
+        println("It's bigger")
+    } else {
+        println("It's smaller")
+    }
+}
+
