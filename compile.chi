@@ -90,7 +90,8 @@ compileModule("std.chim", [
     "std/io.file.chi",
     "std/math.chi",
     "std/math.random.chi",
-    "std/lang.chi"
+    "std/lang.chi",
+    "std/utils.chi"
 ], {
     loadCompiledModules: true,
     verbose: true,

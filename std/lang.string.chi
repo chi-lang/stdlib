@@ -2,69 +2,89 @@ package std/lang.string
 
 import std/lang { luaExpr, embedLua }
 
+type CodePoint = int
+
 pub fn len(s: string): int {
-    luaExpr("utf8.len(s)")
+    luaExpr("s:length()")
 }
 
 pub fn reverse(s: string) {
+    // TODO
     luaExpr("string.reverse(s)")
 }
 
-pub fn find(s: string, pattern: string): int {
-    luaExpr("string.find(s, pattern, 1, true)")
+pub fn find(s: string, pattern: string): Option[int] {
+    val index = luaExpr("s:indexOf(pattern)")
+    if index > 0 {
+        index+1
+    }
 }
 
-pub fn findFrom(s: string, pattern: string, from: int): int {
-    luaExpr("string.find(s, pattern, from, true)")
+pub fn findFrom(s: string, pattern: string, from: int): Option[int] {
+    val index = luaExpr("s:indexOf(pattern, from-1)")
+    if index > 0 {
+        index+1
+    }
 }
 
 pub fn repeatTimes(s: string, times: int): string {
+    // TODO
     luaExpr("string.rep(s, times)")
 }
 
 pub fn repeatSeparated(s: string, times: int, separator: string): string {
+    // TODO
     luaExpr("string.rep(s, times, separator)")
 }
 
 pub fn substringFrom(s: string, from: int): string {
-    luaExpr("string.sub(s, from)")
+    luaExpr("s:substring(from-1)")
 }
 
 pub fn substring(s: string, from: int, to: int): string {
-    luaExpr("string.sub(s, from, to)")
+    luaExpr("s:substring(from, to)")
 }
 
 pub fn toLower(s: string): string {
-    luaExpr("string.lower(s)")
+    luaExpr("s:toLowerCase()")
 }
 
 pub fn toUpper(s: string): string {
-    luaExpr("string.upper(s)")
+    luaExpr("s:toUpperCase()")
 }
 
 pub fn replace(s: string, pattern: string, replacement: string): string {
-    luaExpr("string.gsub(s, pattern, replacement)")
+    luaExpr("s:replace(pattern, replacement)")
 }
 
-pub fn codePointAt(s: string, index: int): int {
-    luaExpr("utf8.codepoint(s, index)")
+pub fn replaceAll(s: string, pattern: string, replacement: string): string {
+    luaExpr("s:replaceAll(pattern, replacement)")
 }
 
-pub fn codePoints(s: string): array[int] {
+pub fn codePointAt(s: string, index: int): CodePoint {
+    luaExpr("s:codePointAt(index-1)")
+}
+
+pub fn codePoints(s: string): array[CodePoint] {
+    // TODO: use proxy to iterate over IntStream and
+    // maybe this should return a generator function instead of an array?
     val x: array[int] = []
-    embedLua("for _, c in utf8.codes(s) do table.insert(x, c) end")
+    embedLua("for _, c in java.luaify(s:codePoints()) do table.insert(x, c) end")
     x
 }
 
-pub fn isWhitespace(cp: int): bool {
+pub fn isWhitespace(cp: CodePoint): bool {
     (28 <= cp && cp <= 32) || (9 <= cp && cp <= 14)
 }
 
-pub fn isDigit(codePoint: int): bool {
+pub fn isDigit(codePoint: CodePoint): bool {
     48 <= codePoint && codePoint <= 57
 }
 
 pub fn forEachCodePoint(s: string, f: (int) -> unit) {
+    // TODO iterate over cps
+    // if codePoints returned generator this function would be useless/
+    // since you can simply run for cp in s.codePoints() { ... }
     var cp = 0
     embedLua("for _, cp in utf8.codes(s) do")
     f(cp)
@@ -72,17 +92,19 @@ pub fn forEachCodePoint(s: string, f: (int) -> unit) {
 }
 
 pub fn allCodePoints(s: string, f: (int) -> bool): bool {
+    // TODO
     embedLua("for _, cp in utf8.codes(s) do if not f(cp) then return false end end")
     true
 }
 
 pub fn anyCodePoint(s: string, f: (int) -> bool): bool {
+    // TODO
     embedLua("for _, cp in utf8.codes(s) do if f(cp) then return true end end")
     false
 }
 
 pub fn isEmpty(s: string): bool {
-    s.len() == 0
+    luaExpr("s:isEmpty()")
 }
 
 pub fn isNotEmpty(s: string): bool {
@@ -90,10 +112,12 @@ pub fn isNotEmpty(s: string): bool {
 }
 
 pub fn isBlank(s: string): bool {
+    // TODO
     s.allCodePoints(isWhitespace) 
 }
 
 pub fn trimStart(s: string): string {
+    // TODO
     var start = 1
     while start < s.len()-1 && isWhitespace(luaExpr("utf8.codepoint(s, start)")) {
         start += 1
@@ -102,6 +126,7 @@ pub fn trimStart(s: string): string {
 }
 
 pub fn trimEnd(s: string): string {
+    // TODO
     var last = -1
     val strlen = -s.len()
     while last > strlen && isWhitespace(s.codePointAt(last)) {
@@ -111,8 +136,9 @@ pub fn trimEnd(s: string): string {
 }
 
 pub fn trim(s: string): string {
-    s.trimStart().trimEnd()
+    luaExpr("s:trim()")
 }
+println("   zażółć geślą jaźń   ".trim())
 
 pub fn startsWith(s: string, other: string): bool {
     s.substring(1, other.len()) == other
@@ -139,3 +165,5 @@ pub fn removePrefix(s: string, prefix: string): string {
         s
     }
 }
+
+

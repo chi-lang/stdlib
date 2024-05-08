@@ -1,0 +1,13 @@
+package std/utils
+
+import std/lang.option { Option }
+
+fn range(from: int, to: int): () -> Option[int] {
+    var next = from
+    { 
+        if next < to {
+            (next += 1) - 1
+        }
+    }
+}
+
