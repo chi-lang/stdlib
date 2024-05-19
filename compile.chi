@@ -14,13 +14,13 @@ pub fn addLast[T](arr: array[T], value: T) {
 }
 
 pub fn writeString(fileName: string, value: string) {
-    embedLua("local f=io.open(fileName,'w')")
+    embedLua("local f=io.open(java.luaify(fileName),'w')")
     embedLua("f:write(value)")
     embedLua("f:close()")
 }
 
 pub fn readString(fileName: string): string {
-    embedLua("local f=io.open(fileName,'r')")
+    embedLua("local f=io.open(java.luaify(fileName),'r')")
     embedLua("local r=f:read('a')")
     embedLua("f:close()")
     luaExpr("r")
@@ -29,6 +29,10 @@ pub fn readString(fileName: string): string {
 
 pub fn loadLuaCode(luaCode: string): () -> unit {
     luaExpr("load(luaCode)")
+}
+
+pub fn concat(sa: array[string]): string {
+    luaExpr("chistr.concat(unpack(sa))")
 }
 
 pub fn compileConcat(files: array[string], opts: { loadCompiledModules: bool, verbose: bool }): string {
@@ -53,7 +57,7 @@ pub fn compileConcat(files: array[string], opts: { loadCompiledModules: bool, ve
         i as int
         i += 1
     }
-    luaExpr("table.concat(results)")
+    results.concat()
 }
 
 pub fn generateBytecode(f: ()->unit): string {

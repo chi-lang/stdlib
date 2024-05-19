@@ -27,10 +27,6 @@ pub fn pop[T](arr: array[T]): T {
     arr.removeLast()
 }
 
-pub fn joinToString(arr: array[string|int], separator: string): string {
-    luaExpr("table.concat(arr, separator)")
-}
-
 pub fn sort[T](arr: array[T]) {
     embedLua("table.sort(arr)")
 }
@@ -89,6 +85,27 @@ pub fn reduce[T](arr: array[T], f: (T, T) -> T): T {
     acc
 }
 
+pub fn intersperse[T](a: array[T], el: T): array[T] {
+    val result = []
+    val len = a.size()
+    for idx, it in a {
+        result.addLast(it)
+        if idx != len {
+            result.addLast(el)
+        }
+    }
+    result
+}
+
 pub fn sum(arr: array[int]): int {
     arr.reduce({ a,b -> a+b })
 }
+
+pub fn joinToString(sa: array[string]): string {
+    luaExpr("chistr.concat(unpack(sa))")
+}
+
+pub fn joinToStringWithSeparator(sa: array[string], sep: string): string {
+    sa.intersperse(sep).joinToString()
+}
+

@@ -6,23 +6,23 @@ type File = { class: string, file: any }
 
 /// Returns a function that iterates over the lines of the file
 pub fn lineIterator(fileName: string): () -> string|unit {
-    luaExpr("io.lines(fileName)")
+    luaExpr("io.lines(java.luaify(fileName))")
 }
 
 pub fn readAllLines(fileName: string): array[string] {
     var a = []
-    embedLua("for line in io.lines(fileName) do table.insert(a,line) end")
+    embedLua("for line in io.lines(java.luaify(fileName)) do table.insert(a,line) end")
     a
 }
 
 pub fn writeString(fileName: string, value: string) {
-    embedLua("local f=io.open(fileName,'w')")
+    embedLua("local f=io.open(java.luaify(fileName),'w')")
     embedLua("f:write(value)")
     embedLua("f:close()")
 }
 
 pub fn readString(fileName: string): string {
-    embedLua("local f=io.open(fileName,'r')")
+    embedLua("local f=io.open(java.luaify(fileName),'r')")
     embedLua("local r=f:read('a')")
     embedLua("f:close()")
     luaExpr("r")
@@ -39,7 +39,7 @@ pub fn readString(fileName: string): string {
 ///         writing is only allowed at the end of file
 pub fn open(name: string, mode: string): Option[File] {
     val f = { class: "io.file.File", file: unit }
-    embedLua("f.file = io.open(name, mode)")
+    embedLua("f.file = io.open(java.luaify(name), java.luaify(mode))")
     embedLua("if f.file == nil then return nil end")
     f
 }

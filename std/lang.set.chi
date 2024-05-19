@@ -5,7 +5,8 @@ import std/lang { luaExpr, embedLua }
 type Set[T] = { class: string, set: any }
 
 fn emptySet[T](): Set[T] {
-    { class: "lang.set.Set", set: {} }
+    val set = { class: "lang.set.Set", set: {} }
+    set
 }
 
 fn fromArray[T](arr: array[T]): Set[T] {

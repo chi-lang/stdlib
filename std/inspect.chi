@@ -1,0 +1,91 @@
+package std/inspect
+
+import std/lang { luaExpr }
+import std/lang.set { emptySet, Set }
+import std/lang.map { emptyMap, Map }
+
+// TODO
+// This is not ready yet. I'm not sure if this should be even available.
+// Probably some dedicated system to load code and track what is loaded 
+// and what uses what would be needed.
+
+// Features:
+//  - list loaded modules
+//  - list packages within module
+//  - list variables/functions within a package
+//  - variables/functions should be described with visibility (is public?), name, type
+
+type ModuleName = string
+type PackageName = string
+type Package = { name: string, public: bool, mutable: bool }
+
+
+fn forEachPackage(f: (ModuleName, PackageName, Package) -> unit) {
+    val loaded = luaExpr("package.loaded") as {}
+    for k, v in loaded {
+        val key: string = luaExpr("java.new(String,k)")
+        if key.contains("/") {
+            val tmp = key.split("/")
+            f(tmp[1], tmp[2], v)
+        }
+    }
+}
+
+fn listAllPackages(): array[Package] {
+    val result = []
+    forEachPackage() { modName, pkgName, pkg ->
+        result.addLast(pkg)
+    }
+    result
+}
+
+
+
+
+pub fn listModules(): Set[ModuleName] {
+    val result = emptySet()
+    forEachPackage({ modName, pkgName, pkg ->
+        result.add(modName)
+    })
+    result
+}
+
+pub fn listPackages(rootModName: ModuleName): Set[PackageName] {
+    val result = emptySet()
+    forEachPackage() { modName, pkgName, pkg ->
+        if luaExpr("rootModName:equals(modName)") {
+            result.add(pkgName)
+        }
+    }
+    result
+}
+
+pub fn listFunctions(modName: ModuleName, pkgName: PackageName): Set[string] {
+    val result = emptySet()
+    val qualifiedName = "$modName/$pkgName"
+    val pkg: {} = luaExpr("package.loaded[qualifiedName]._package") as {}
+    for k, v in pkg {
+        val key: string = luaExpr("java.new(String,k)")
+        result.add(key)
+    }
+    result
+}
+
+
+
+//println(listModules())
+
+println("Modules:")
+listModules().forEach(println)
+
+println("")
+println("Packages:")
+listPackages("std").forEach(println)
+
+println("")
+println("Functions:")
+listFunctions("std","lang.string").forEach(println)
+
+listAllPackages().forEach() { it: Package ->
+    println(it.public)
+}

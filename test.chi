@@ -1,0 +1,22 @@
+import std/lang { luaExpr, embedLua }
+import std/lang.option { Option }
+
+fn codePoints(s: string): () -> Option[int] {
+    luaExpr("chistr.codePoints(s)")
+}
+
+pub fn allCodePoints(s: string, f: (int) -> bool): bool {
+    for cp in s.codePoints() {
+        embedLua("chi_println(type(f))")
+        if !f(cp) { 
+            return false
+        }
+    }
+    true
+}
+
+
+
+for cp in "hello".codePoints() {
+    println(cp)
+}
