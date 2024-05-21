@@ -30,3 +30,4 @@ pub fn map[T,R](opt: Option[T], f: (T) -> R): Option[R] {
         f(opt)
     }
 }
+

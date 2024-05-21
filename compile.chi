@@ -38,13 +38,13 @@ pub fn concat(sa: array[string]): string {
 pub fn compileConcat(files: array[string], opts: { loadCompiledModules: bool, verbose: bool }): string {
     var i = 1
     val results = []
-    while i <= files.size() {
-        val fileName = files[i]
+    for i, fileName in files {
         if opts.verbose {
             println("Compiling $fileName...")
         }
         val chiCode = readString(fileName)
         val luaCode = compileLua(chiCode)
+        //val num = i as string
         results.addLast("function m${i}() ")
         results.addLast(luaCode)
         results.addLast(" end;m${i}();")
@@ -53,9 +53,6 @@ pub fn compileConcat(files: array[string], opts: { loadCompiledModules: bool, ve
             val loader = loadLuaCode(luaCode)
             loader()
         }
-
-        i as int
-        i += 1
     }
     results.concat()
 }
