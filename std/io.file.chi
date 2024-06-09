@@ -6,12 +6,18 @@ type File = { class: string, file: any }
 
 /// Returns a function that iterates over the lines of the file
 pub fn lineIterator(fileName: string): () -> string|unit {
-    luaExpr("io.lines(java.luaify(fileName))")
+    val lines = luaExpr("io.lines(java.luaify(fileName))") as () -> Option[string]
+    {
+        val line = lines()
+        if line != unit {
+            val ignored: string = luaExpr("java.new(String,line)")
+        }
+    }
 }
 
 pub fn readAllLines(fileName: string): array[string] {
     var a = []
-    embedLua("for line in io.lines(java.luaify(fileName)) do table.insert(a,line) end")
+    for line in lineIterator(fileName) { a.addLast(line) }
     a
 }
 
@@ -25,7 +31,7 @@ pub fn readString(fileName: string): string {
     embedLua("local f=io.open(java.luaify(fileName),'r')")
     embedLua("local r=f:read('a')")
     embedLua("f:close()")
-    luaExpr("r")
+    luaExpr("java.new(String,r)")
 }
 
 /// Opens a file

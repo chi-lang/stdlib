@@ -82,15 +82,18 @@ pub fn compileModule(
 
 
 compileModule("std.chim", [
-    "std/lang.option.chi",
-    "std/lang.array.chi",
-    "std/lang.map.chi",
-    "std/lang.set.chi",
-    "std/lang.string.chi",
-    "std/io.chi",
-    "std/io.file.chi",
     "std/math.chi",
     "std/math.random.chi",
+    "std/lang.int.chi",
+    "std/lang.float.chi",
+    "std/lang.option.chi",
+    "std/lang.array.chi",
+    "std/lang.string.chi",
+    "std/lang.any.chi",
+    "std/lang.map.chi",
+    "std/lang.set.chi",
+    "std/io.chi",
+    "std/io.file.chi",
     "std/lang.chi",
     "std/utils.chi"
 ], {

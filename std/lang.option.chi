@@ -31,3 +31,12 @@ pub fn map[T,R](opt: Option[T], f: (T) -> R): Option[R] {
     }
 }
 
+pub fn ifPresent[T](opt: Option[T], f: (T) -> unit) {
+    if opt is unit {
+        unit
+    } else {
+        opt is T
+        f(opt)
+    }
+}
+

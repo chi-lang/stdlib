@@ -1,15 +1,20 @@
 package std/lang.set
 
 import std/lang { luaExpr, embedLua }
+import std/lang.any {
+    toString as anyToString, 
+    hashCode as anyHashCode,
+    equals as anyEquals
+}
 
-type Set[T] = { class: string, set: any }
+type Set[T] = { class: string, set: {}, hash: (T) -> int }
 
-fn emptySet[T](): Set[T] {
-    val set = { class: "lang.set.Set", set: {} }
+pub fn emptySet[T](): Set[T] {
+    val set = { class: "lang.set.Set", set: {}, hash: anyHashCode as (T) -> int }
     set
 }
 
-fn fromArray[T](arr: array[T]): Set[T] {
+pub fn fromArray[T](arr: array[T]): Set[T] {
     val set = emptySet()
     arr.forEach() { it ->
         set.add(it)
@@ -17,29 +22,49 @@ fn fromArray[T](arr: array[T]): Set[T] {
     set
 }
 
-fn add[T](set: Set[T], value: T) {
-    embedLua("set.set[value] = true")
+
+pub fn add[T](set: Set[T], value: T) {
+    val hash = set.hash(value)
+    val a: array[T] = luaExpr("rawget(set.set,hash) or chi_new_array()")
+    if a.all { it -> !anyEquals(it, value) } {
+        a.addLast(value)
+    }
+    embedLua("rawset(set.set,hash,a)")
 }
 
-fn remove[T](set: Set[T], value: T) {
-    embedLua("set.set[value] = nil")
+pub fn remove[T](set: Set[T], value: T) {
+    val hash = set.hash(value)
+    val a: array[T] = luaExpr("rawget(set.set,hash) or chi_new_array()")
+    val index = a.indexOf { it -> anyEquals(it, value) }
+    if index != unit {
+        a.removeAt(index as int)
+    }
+
+    if a.isEmpty() {
+        embedLua("rawset(set.set,hash,nil)")
+    } else {
+        embedLua("rawset(set.set,hash,a)")
+    }
 }
 
-fn contains[T](set: Set[T], value: T): bool {
-    luaExpr("set.set[value] or false") as bool
+pub fn contains[T](set: Set[T], value: T): bool {
+    val hash = set.hash(value)
+    val a: array[T] = luaExpr("rawget(set.set,hash) or chi_new_array()")
+    val index = a.indexOf { it -> anyEquals(it, value) }
+    index != unit
 }
 
-fn size[T](set: Set[T]): int {
+pub fn size[T](set: Set[T]): int {
     var result = 0
-    embedLua("for _ in pairs(set.set) do result = result + 1 end")
+    embedLua("for h,a in pairs(set.set) do result = result + #a end")
     result
 }
 
-fn forEach[T](set: Set[T], f: (T) -> unit) {
-    embedLua("for k,v in pairs(set.set) do f(k) end")
+pub fn forEach[T](set: Set[T], f: (T) -> unit) {
+    embedLua("for k,a in pairs(set.set) do for _,v in ipairs(a) do f(v) end end")
 }
 
-fn toArray[T](set: Set[T]): array[T] {
+pub fn toArray[T](set: Set[T]): array[T] {
     val result = []
     set.forEach() { it ->
         result.push(it)
@@ -47,9 +72,29 @@ fn toArray[T](set: Set[T]): array[T] {
     result
 }
 
-fn fold[T,R](set: Set[T], initialValue: R, f: (R,T) -> R): R {
-    var acc = initialValue
-    embedLua("for k,_ in pairs(set.set) do acc = f(acc, k) end")
-    acc
+pub fn toString[T](set: Set[T]): string {
+    val elements = []
+    set.forEach { it ->
+        elements.addLast(anyToString(it))
+    }
+    val content = elements.intersperse(", ").joinToString()
+    "{$content}"
 }
 
+//{
+//    val a = { x: -31, y: 47 }
+//    val b = { x: -34, y: 20 }
+//    println(anyHashCode(a))
+//    println(anyHashCode(b))
+//
+//    val s = emptySet()
+//    s.add(a)
+//    s.add(b)
+//    s.add(b)
+//    s.add(a)
+//    s.add(b)
+//    s.add(b)
+//    s.add(a)
+//
+//    println(s)
+//}()

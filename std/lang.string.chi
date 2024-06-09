@@ -2,6 +2,7 @@ package std/lang.string
 
 import std/lang.option { Option }
 import std/lang { luaExpr, embedLua }
+import std/math { pow }
 
 type CodePoint = int
 
@@ -13,26 +14,15 @@ pub fn reverse(s: string) {
     luaExpr("chistr.reverse(s)")
 }
 
-pub fn find(s: string, pattern: string): Option[int] {
-    val index = luaExpr("s:indexOf(pattern)")
-    if index > 0 {
-        index+1
-    }
-}
-
-pub fn findFrom(s: string, pattern: string, from: int): Option[int] {
+pub fn find(s: string, pattern: string, from: int = 1): Option[int] {
     val index = luaExpr("s:indexOf(pattern, from-1)")
-    if index > 0 {
+    if index >= 0 {
         index+1
     }
 }
 
-pub fn substringFrom(s: string, from: int): string {
-    luaExpr("s:substring(from-1)")
-}
-
-pub fn substring(s: string, from: int, to: int): string {
-    luaExpr("s:substring(from, to)")
+pub fn substring(s: string, from: int = 1, to: int = s.len()): string {
+    luaExpr("chi_new_string(s:substring(from-1, to))")
 }
 
 pub fn toLower(s: string): string {
@@ -133,15 +123,28 @@ pub fn contains(s: string, other: string): bool {
 pub fn split(s: string, pattern: string): array[string] {
     val array = luaExpr("java.luaify(s:split(pattern))")
     embedLua("setmetatable(array, array_meta_table)")
-    array
+    (array as array[string]).map { it -> luaExpr("chi_new_string(it)") } as array[string]
 }
 
 
 pub fn removePrefix(s: string, prefix: string): string {
     if s.startsWith(prefix) {
-        s.substringFrom(prefix.len()+1)
+        substring(s, prefix.len()+1)
     } else {
         s
     }
 }
 
+pub fn hashCode(s: string): int {
+    var hc = 0
+    var x = s.len()-1
+    for cp in s.codePoints() {
+        hc += cp * pow(31,x)
+        x -= 1
+    }
+    hc
+}
+
+pub fn toInt(s: string): int {
+    luaExpr("tonumber(java.luaify(s))")
+}

@@ -1,0 +1,34 @@
+package std/lang.float
+
+import std/math as math
+
+pub val abs = math.fabs
+pub val min = math.fmin
+pub val max = math.fmax
+pub val cos = math.cos
+pub val acos = math.acos
+pub val cosh = math.cosh
+pub val sin = math.sin
+pub val asin = math.asin
+pub val sinh = math.sinh
+pub val tan = math.tan
+pub val atan = math.atan
+pub val tanh = math.tanh
+pub val radToDeg = math.degrees
+pub val degToRad = math.radians
+pub val ceil = math.ceil
+pub val floor = math.floor
+pub val exp = math.exp
+pub val log = math.log
+pub val pow = math.fpow
+pub val sqrt = math.sqrt
+pub val modf = math.modf
+pub val mod = math.fmod
+
+pub fn toInt(f: float): int {
+    math.floor(f) as int
+}
+
+pub fn hashCode(f: float): int {
+    (f * 1000.0).toInt().hashCode()
+}

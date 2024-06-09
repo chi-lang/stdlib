@@ -1,0 +1,17 @@
+package std/lang.int
+
+import std/math as math
+
+
+pub val abs = math.abs
+pub val min = math.min
+pub val max = math.max
+pub val pow = math.pow
+
+pub fn hashCode(i: int): int {
+    i
+}
+
+pub fn toFloat(i: int): float {
+    i as float
+}

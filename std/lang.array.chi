@@ -27,12 +27,21 @@ pub fn pop[T](arr: array[T]): T {
     arr.removeLast()
 }
 
+pub fn indexOf[T](arr: array[T], f: (T) -> bool): Option[int] {
+    embedLua("for i, v in ipairs(arr) do if f(v) then return i end end")
+    unit
+}
+
 pub fn sort[T](arr: array[T]) {
     embedLua("table.sort(arr)")
 }
 
 pub fn sortWith[T](arr: array[T], comp: (T, T) -> bool) {
     embedLua("table.sort(arr, comp)")
+}
+
+pub fn isEmpty[T](arr: array[T]): bool {
+    return arr.size() == 0
 }
 
 pub fn any[T](arr: array[T], f: (T) -> bool): bool {

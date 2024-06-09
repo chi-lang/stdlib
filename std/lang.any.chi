@@ -1,0 +1,70 @@
+package std/lang.any
+
+import std/lang { luaExpr }
+import std/lang.int { hashCode as intHashCode }
+import std/lang.float { hashCode as floatHashCode }
+import std/lang.string { hashCode as stringHashCode }
+
+pub fn hashCode(value: any): int {
+    when {
+        value is float -> { floatHashCode(value as float) }
+        value is int -> { intHashCode(value as int) }
+        value is string -> { stringHashCode(value as string) }
+        value is bool -> { if value as bool { 1 } else { 2 } }
+        value is array[any] -> {
+            var result = 17
+            for i, el in value as array[any] {
+                result = result * 31 + hashCode(el)
+            }
+            result
+        }
+        else -> 0
+    }
+}
+
+// FIXME when compiler supports recursion
+var equals: (any, any) -> bool = { a, b -> false }
+pub fn equals(value: any, other: any): bool {
+    if luaExpr("type(value)") != luaExpr("type(other)") {
+        return false
+    }
+
+    when {
+        value is string && other is string -> { luaExpr("value:equals(other)") as bool }
+        value is array[any] && other is array[any] -> { 
+            val v = value as array[any]
+            val o = other as array[any]
+            if v.size() != o.size() {
+                return false
+            }
+            for index, element in v {
+                val otherElement = o[index]
+                if !equals(element, otherElement) {
+                    return false
+                }
+            }
+            true
+        }
+        value is {} && other is {} -> {
+            val v = value as {}
+            val o = other as {}
+            // FIXME: this is suboptimal af but will do for now
+            var allEqual = true
+            for key, vvalue in v {
+                val ovalue = luaExpr("rawget(o, java.luaify(key))") as any
+                if !equals(vvalue, ovalue) {
+                    return false
+                }
+            }
+            for key, ovalue in o {
+                val vvalue = luaExpr("rawget(v, java.luaify(key))") as any
+                if !equals(vvalue, ovalue) {
+                    return false
+                }
+            }
+            true
+        }
+        else -> value == other
+    }
+}
+
