@@ -5,6 +5,7 @@ import std/lang.int { hashCode as intHashCode }
 import std/lang.float { hashCode as floatHashCode }
 import std/lang.string { hashCode as stringHashCode }
 
+var hashCode = { value: any -> 0 }
 pub fn hashCode(value: any): int {
     when {
         value is float -> { floatHashCode(value as float) }
