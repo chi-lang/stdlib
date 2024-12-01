@@ -20,6 +20,15 @@ pub fn get[K,V](m: Map[K,V], key: K): V {
     luaExpr("m.map[key]")
 }
 
+pub fn getOrDefault[K,V](m: Map[K,V], key: K, default: V): V {
+    val value = m.get(key)
+    if value == unit {
+        default
+    } else {
+        value
+    }
+}
+
 pub fn size[K,V](m: Map[K,V]): int {
     var result = 0
     embedLua("for _ in pairs(m.map) do result = result + 1 end")
