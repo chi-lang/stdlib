@@ -54,6 +54,12 @@ pub fn all[T](arr: array[T], f: (T) -> bool): bool {
     true
 }
 
+pub fn count[T](arr: array[T], f: (T) -> bool): int {
+    var c = 0
+    embedLua("for _, v in ipairs(arr) do if f(v) then c = c + 1 end end")
+    c
+}
+
 pub fn first[T](arr: array[T]): Option[T] {
     luaExpr("arr[1]")
 }
