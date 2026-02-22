@@ -17,4 +17,6 @@ pub fn randomFloat(): float {
     lua("math.random()")
 }
 
+lua("math.randomseed(os.time())")
+
 

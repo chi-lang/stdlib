@@ -3,7 +3,7 @@ import std/io { readLine }
 import std/math.random { randomInt }
 import std/lang { luaExpr }
 
-val number = randomInt(0, 10)
+val number = randomInt(0, 100)
 
 println("I've chosen number from 0 to 100. Guess which one!")
 
