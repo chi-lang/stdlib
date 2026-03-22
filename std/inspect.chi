@@ -23,7 +23,7 @@ type Package = { name: string, public: bool, mutable: bool }
 fn forEachPackage(f: (ModuleName, PackageName, Package) -> unit) {
     val loaded = luaExpr("package.loaded") as {}
     for k, v in loaded {
-        val key: string = luaExpr("java.new(String,k)")
+        val key: string = luaExpr("k")
         if key.contains("/") {
             val tmp = key.split("/")
             f(tmp[1], tmp[2], v)
@@ -53,7 +53,7 @@ pub fn listModules(): Set[ModuleName] {
 pub fn listPackages(rootModName: ModuleName): Set[PackageName] {
     val result = emptySet()
     forEachPackage() { modName, pkgName, pkg ->
-        if luaExpr("rootModName:equals(modName)") {
+        if luaExpr("rootModName == modName") {
             result.add(pkgName)
         }
     }
@@ -65,7 +65,7 @@ pub fn listFunctions(modName: ModuleName, pkgName: PackageName): Set[string] {
     val qualifiedName = "$modName/$pkgName"
     val pkg: {} = luaExpr("package.loaded[qualifiedName]._package") as {}
     for k, v in pkg {
-        val key: string = luaExpr("java.new(String,k)")
+        val key: string = luaExpr("k")
         result.add(key)
     }
     result

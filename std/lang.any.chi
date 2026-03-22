@@ -31,7 +31,7 @@ pub fn equals(value: any, other: any): bool {
     }
 
     when {
-        value is string && other is string -> { luaExpr("value:equals(other)") as bool }
+        value is string && other is string -> { luaExpr("value == other") as bool }
         value is array[any] && other is array[any] -> { 
             val v = value as array[any]
             val o = other as array[any]
@@ -52,13 +52,13 @@ pub fn equals(value: any, other: any): bool {
             // FIXME: this is suboptimal af but will do for now
             var allEqual = true
             for key, vvalue in v {
-                val ovalue = luaExpr("rawget(o, java.luaify(key))") as any
+                val ovalue = luaExpr("rawget(o, key)") as any
                 if !equals(vvalue, ovalue) {
                     return false
                 }
             }
             for key, ovalue in o {
-                val vvalue = luaExpr("rawget(v, java.luaify(key))") as any
+                val vvalue = luaExpr("rawget(v, key)") as any
                 if !equals(vvalue, ovalue) {
                     return false
                 }

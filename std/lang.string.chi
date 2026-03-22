@@ -7,7 +7,7 @@ import std/math { pow }
 type CodePoint = int
 
 pub fn len(s: string): int {
-    luaExpr("s:length()")
+    luaExpr("utf8.len(s)")
 }
 
 pub fn reverse(s: string) {
@@ -15,34 +15,32 @@ pub fn reverse(s: string) {
 }
 
 pub fn find(s: string, pattern: string, from: int = 1): Option[int] {
-    val index = luaExpr("s:indexOf(pattern, from-1)")
-    if index >= 0 {
-        index+1
-    }
+    embedLua("local r = string.find(s, pattern, from, true); if r then return r end")
+    unit
 }
 
 pub fn substring(s: string, from: int = 1, to: int = s.len()): string {
-    luaExpr("chi_new_string(s:substring(from-1, to))")
+    luaExpr("utf8.sub(s, from, to)")
 }
 
 pub fn toLower(s: string): string {
-    luaExpr("s:toLowerCase()")
+    luaExpr("utf8.lower(s)")
 }
 
 pub fn toUpper(s: string): string {
-    luaExpr("s:toUpperCase()")
+    luaExpr("utf8.upper(s)")
 }
 
 pub fn replace(s: string, pattern: string, replacement: string): string {
-    luaExpr("s:replace(pattern, replacement)")
+    luaExpr("chistr.replace(s, pattern, replacement)")
 }
 
 pub fn replaceAll(s: string, pattern: string, replacement: string): string {
-    luaExpr("s:replaceAll(pattern, replacement)")
+    luaExpr("s:gsub(pattern, replacement)")
 }
 
 pub fn codePointAt(s: string, index: int): CodePoint {
-    luaExpr("s:codePointAt(index-1)")
+    luaExpr("utf8.codepoint(s, index)")
 }
 
 pub fn codePoints(s: string): () -> Option[CodePoint] {
@@ -83,7 +81,7 @@ pub fn anyCodePoint(s: string, f: (int) -> bool): bool {
 }
 
 pub fn isEmpty(s: string): bool {
-    luaExpr("s:isEmpty()")
+    luaExpr("#s == 0")
 }
 
 pub fn isNotEmpty(s: string): bool {
@@ -104,26 +102,26 @@ pub fn trimEnd(s: string): string {
 }
 
 pub fn trim(s: string): string {
-    luaExpr("s:trim()")
+    luaExpr("chistr.trim(s)")
 }
 
 pub fn startsWith(s: string, other: string): bool {
-    luaExpr("s:startsWith(other)")
+    luaExpr("s:sub(1, #other) == other")
 
 }
 
 pub fn endsWith(s: string, other: string): bool {
-    luaExpr("s:endsWith(other)")
+    luaExpr("#other == 0 or s:sub(-#other) == other")
 }
 
 pub fn contains(s: string, other: string): bool {
-    luaExpr("s:contains(other)")
+    luaExpr("s:find(other, 1, true) ~= nil")
 }
 
 pub fn split(s: string, pattern: string): array[string] {
-    val array = luaExpr("java.luaify(s:split(pattern))")
+    val array = luaExpr("chistr.split(s, pattern)")
     embedLua("setmetatable(array, array_meta_table)")
-    (array as array[string]).map { it -> luaExpr("chi_new_string(it)") } as array[string]
+    array as array[string]
 }
 
 
@@ -146,5 +144,5 @@ pub fn hashCode(s: string): int {
 }
 
 pub fn toInt(s: string): int {
-    luaExpr("tonumber(java.luaify(s))")
+    luaExpr("tonumber(s)")
 }
