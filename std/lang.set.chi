@@ -77,7 +77,7 @@ pub fn toString[T](set: Set[T]): string {
     set.forEach { it ->
         elements.addLast(anyToString(it))
     }
-    val content = elements.intersperse(", ").joinToString()
+    val content = elements.joinToStringWithSeparator(", ")
     "{$content}"
 }
 
