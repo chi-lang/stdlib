@@ -18,7 +18,7 @@ compileModule("std.chim", [
     "std/lang.chi",
     "std/utils.chi"
 ], {
-    loadCompiledModules: false,
+    loadCompiledModules: true,
     verbose: true,
     binary: false
 })

@@ -4,18 +4,13 @@ import std/lang.option { Option }
 
 type File = { class: string, file: any }
 
-/// Returns a function that iterates over the lines of the file
 pub fn lineIterator(fileName: string): () -> string|unit {
-    val lines = luaExpr("io.lines(fileName)") as () -> Option[string]
-    {
-        lines()
-    }
+    luaExpr("io.lines(fileName)")
 }
 
 pub fn readAllLines(fileName: string): array[string] {
-    var a = []
-    for line in lineIterator(fileName) { a.addLast(line) }
-    a
+    embedLua("local a = chi_array(); for line in io.lines(fileName) do a:addLast(line) end")
+    luaExpr("a")
 }
 
 pub fn writeString(fileName: string, value: string) {
@@ -31,15 +26,6 @@ pub fn readString(fileName: string): string {
     luaExpr("r")
 }
 
-/// Opens a file
-/// Modes: 
-///  - "r" read mode
-///  - "w" write mode
-///  - "a" append mode
-///  - "r+" update mode, all previous data is preserved
-///  - "w+" update mode, all previous data is erased
-///  - "a+" append update mode, previous data is preserved, 
-///         writing is only allowed at the end of file
 pub fn open(name: string, mode: string): Option[File] {
     val f = { class: "io.file.File", file: unit }
     embedLua("f.file = io.open(name, mode)")
@@ -74,4 +60,3 @@ pub fn close(file: File) {
 pub fn write(file: File, value: string | float | int) {
     embedLua("file.file:write(value)")
 }
-
