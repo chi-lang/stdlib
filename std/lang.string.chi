@@ -146,3 +146,15 @@ pub fn hashCode(s: string): int {
 pub fn toInt(s: string): int {
     luaExpr("tonumber(s)")
 }
+
+pub fn charCodeAt(s: string, pos: int): int {
+    luaExpr("string.byte(s, pos)")
+}
+
+pub fn fromCharCode(code: int): string {
+    luaExpr("string.char(code)")
+}
+
+pub fn byteSub(s: string, from: int, to: int): string {
+    luaExpr("s:sub(from, to)")
+}

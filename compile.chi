@@ -15,6 +15,7 @@ compileModule("std.chim", [
     "std/lang.set.chi",
     "std/io.chi",
     "std/io.file.chi",
+    "std/os.chi",
     "std/lang.chi",
     "std/utils.chi"
 ], {

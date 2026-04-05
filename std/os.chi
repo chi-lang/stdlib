@@ -1,0 +1,13 @@
+package std/os
+
+import std/lang { luaExpr, embedLua }
+import std/lang.option { Option }
+
+pub fn getEnv(name: string): Option[string] {
+    embedLua("local v = os.getenv(name); if v then return v end")
+    unit
+}
+
+pub fn clock(): float {
+    luaExpr("os.clock()") as float
+}

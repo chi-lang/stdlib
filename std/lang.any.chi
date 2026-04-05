@@ -69,3 +69,7 @@ pub fn equals(value: any, other: any): bool {
     }
 }
 
+pub fn refEq(a: any, b: any): bool {
+    luaExpr("a == b")
+}
+
