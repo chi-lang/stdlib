@@ -147,6 +147,10 @@ pub fn toInt(s: string): int {
     luaExpr("tonumber(s)")
 }
 
+pub fn toFloat(s: string): float {
+    luaExpr("tonumber(s)")
+}
+
 pub fn charCodeAt(s: string, pos: int): int {
     luaExpr("string.byte(s, pos)")
 }

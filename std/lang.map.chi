@@ -29,6 +29,14 @@ pub fn getOrDefault[K,V](m: Map[K,V], key: K, default: V): V {
     }
 }
 
+pub fn remove[K,V](m: Map[K,V], key: K) {
+    embedLua("m.map[key] = nil")
+}
+
+pub fn has[K,V](m: Map[K,V], key: K): bool {
+    luaExpr("m.map[key] ~= nil")
+}
+
 pub fn size[K,V](m: Map[K,V]): int {
     var result = 0
     embedLua("for _ in pairs(m.map) do result = result + 1 end")
