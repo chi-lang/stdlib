@@ -162,3 +162,7 @@ pub fn fromCharCode(code: int): string {
 pub fn byteSub(s: string, from: int, to: int): string {
     luaExpr("s:sub(from, to)")
 }
+
+pub fn byteLen(s: string): int {
+    luaExpr("#s")
+}
