@@ -9,8 +9,9 @@ pub fn lineIterator(fileName: string): () -> string|unit {
 }
 
 pub fn readAllLines(fileName: string): array[string] {
-    embedLua("local a = chi_array(); for line in io.lines(fileName) do a:addLast(line) end")
-    luaExpr("a")
+    var a = []
+    for line in lineIterator(fileName) { a.addLast(line) }
+    a
 }
 
 pub fn writeString(fileName: string, value: string) {
